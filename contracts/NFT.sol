@@ -40,6 +40,7 @@ contract NFT is ERC721, Ownable, ReentrancyGuard, Pausable {
         require(tokenCounter > 25, "Hero nft need to mint first");
         _;
     }
+    
 
     function mintHero() public onlyOwner ReentrancyGuard whenNotPaused {
         for (uint256 i = 0; i < 25; i++) {
