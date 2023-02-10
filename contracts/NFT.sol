@@ -18,11 +18,14 @@ contract NFT is ERC721, Ownable, ReentrancyGuard, Pausable {
     address public founder;
     uint256 private tokenCounter = 1;
     bool private heroNFT;
-    //static prcing
+    // prcing
     uint256 public legendNFT = 1.54 ether;
     uint256 public rareNFT = 0.31 ether;
     uint256 public UncommonNFT = 0.062 ether;
     uint256 public commonNFT = 0.012 ether;
+    //mapping
+    mapping(uint256 => mapping(bool => address)) public legendNFTToOwner;
+
     constructor(address _founder, string memory _initBaseURI)
         ERC721("HeroNFT", "HNFT")
     {
@@ -36,34 +39,34 @@ contract NFT is ERC721, Ownable, ReentrancyGuard, Pausable {
         _;
     }
     modifier generalCounter() {
-        require(heroNFT, "1st Round is not started, yet")
+        require(heroNFT, "1st Round is not started, yet");
         require(tokenCounter > 25, "Hero nft need to mint first");
         _;
     }
-    
-
-    function mintHero() public onlyOwner ReentrancyGuard whenNotPaused {
-        for (uint256 i = 0; i < 25; i++) {
-            _safeMint(msg.sender, i);
-        }
+    modifier legendCompilance() {
+      
+        require(msg.value >= legendNFT, "Insufficient funds to mint !!");
+        _;
     }
 
-    function transferToFounders()
-        public
-        onlyOwner
-        ReentrancyGuard
-        whenNotPaused
-    {
+    function mintHero() public onlyOwner nonReentrant whenNotPaused {
+        uint256 increment = 1;
         for (uint256 i = 0; i < 25; i++) {
-            safeTransferFrom(msg.sender, founder, i);
-            emit TransferTo(msg.sender, founder, i);
+            _safeMint(msg.sender, i);
+            increment++;
         }
-        heroNFT = true;
+        //gas saving tecnique
+        tokenCounter = increment;
     }
 
     //public function
-
-
+    function mintLegend()
+        public
+        payable
+        generalCounter
+        nonReentrant
+        whenNotPaused
+    {}
 
     function tokenURI(uint256 tokenId)
         public
@@ -112,6 +115,6 @@ contract NFT is ERC721, Ownable, ReentrancyGuard, Pausable {
         public
         onlyOwner
     {
-        founder = _founder;
+        founder = _newfounderAddress;
     }
 }
