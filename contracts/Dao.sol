@@ -87,7 +87,6 @@ contract aryaNFT is Ownable, ReentrancyGuard, Pausable, ERC721URIStorage {
             legendNFTCounter++;
         } else if (secondPublicRound) {
             require(legendNFTCounter <= 11, "all NFT minted in second round");
-
             _safeMint(msg.sender, 24 + legendNFTCounter);
             legendNFTIdToOwner[24 + legendNFTCounter] = msg.sender;
             _totalMinted.increment();
@@ -260,7 +259,6 @@ contract aryaNFT is Ownable, ReentrancyGuard, Pausable, ERC721URIStorage {
         _unpause();
     }
 
-    //need to set automatic = as soon as nft someone purchase nft, payment of that nft is going to split.
     function splitPayment(address payable daoContract)
         external
         onlyOwner
