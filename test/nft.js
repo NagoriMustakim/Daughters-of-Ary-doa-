@@ -47,17 +47,46 @@ describe("NFT contract", () => {
         })
 
         it("Start public round", async () => {
+            //stating first public round
             let tx = await nft.connect(acc1).startFirstPublicRound();
             await tx.wait();
+            //testing first public round
             let firstPublicRound = await nft.firstPublicRound()
             expect(firstPublicRound).to.be.equal(true);
-            let amount = "1";
-            amount = ethers.utils.parseEther(amount)
-            amount = ethers.utils.formatUnits(amount.toString())
-            let mintLegend = await nft.connect(acc2).mintLegend({ value: ethers.utils.parseEther(amount) });
+            //eth to contract
+            let options = { value: ethers.utils.parseEther("2.0") }
+            //minting legend nft
+            let mintLegend = await nft.connect(acc2).mintLegend(options);
             await mintLegend.wait()
+            //testing legend counter
             let legendNFTCounter = await nft.legendNFTCounter();
             expect(parseInt(legendNFTCounter)).to.be.equal(2);
+            //checkinh tokenuri
+            let tokenuri = await nft.tokenURI(25);
+            console.log((tokenuri));
+            //owner of contract
+            let ownerofnft = await nft.ownerOf(25);
+            console.log(ownerofnft);
+            console.log(acc2.address);
+            //checking rarenftcounter
+            let rareNFTCounter = await nft.rareNFTCounter();
+            expect(parseInt(rareNFTCounter)).to.be.equal(1);
+            //eth to contract
+            options = { value: ethers.utils.parseEther("0.33") }
+            //minting all rare nft in first round
+            for (let i = 0; i < 5; i++) {
+                let mintrare = await nft.connect(acc3).mintRare(options);
+                await mintrare.wait()
+            }
+            rareNFTCounter = await nft.rareNFTCounter();
+            expect(parseInt(rareNFTCounter)).to.be.equal(6);
+           
+            
+            //acc2 is not owner of nft contract thus it will give error that's why below code is commented
+            // tx = await nft.connect(acc2).startSecondPublicRound()
+            // await tx.wait();
+
+            //starting 2nd public round before starting second round we need to mint all nft in first round
             // tx = await nft.connect(acc1).startSecondPublicRound()
             // await tx.wait();
             // let second = await nft.secondPublicRound()
