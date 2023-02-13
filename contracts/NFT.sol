@@ -44,7 +44,7 @@ contract aryaNFT is Ownable, ReentrancyGuard, Pausable, ERC721URIStorage {
     bool public is3rdPublicRoundUnlocked;
     bool public _isHeroMinted;
 
-    //modifier
+    //payment check
     modifier checkLegendNFTPayment() {
         require(msg.value >= legendNFTPrice , "Insufficient value: Legend NFTs cost " & legendNFTPrice & " ether" );
         _;
