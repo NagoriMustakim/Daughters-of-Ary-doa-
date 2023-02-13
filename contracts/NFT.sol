@@ -20,11 +20,18 @@ contract aryaNFT is Ownable, ReentrancyGuard, Pausable, ERC721URIStorage {
     uint256 public uncommonNFTCounter = 1;
     uint256 public commonNFTCounter = 1;
 
+    //#  NFTs supply in 1st 10K round
+    uint256 public HERO_NFT_SUPPLY = 25;
+    uint256 public LEGEND_NFT_SUPPLY = 1;
+    uint256 public RARE_NFT_SUPPLY = 1;
+    uint256 public UNCOMMON_NFT_SUPPLY = 1;
+    uint256 public COMMON_NFT_SUPPLY = 1;
+
     // pricing
-    uint256 public legendNFT = 1.64 ether; //~$2500
-    uint256 public rareNFT = 0.33 ether; //~$500
-    uint256 public uncommonNFT = 0.066 ether; //~$100
-    uint256 public commonNFT = 0.013 ether; //~$20
+    uint256 public legendNFTPrice = 1.64 ether; //~$2500
+    uint256 public rareNFTPrice = 0.33 ether; //~$500
+    uint256 public uncommonNFTPrice = 0.066 ether; //~$100
+    uint256 public commonNFTPrice = 0.013 ether; //~$20
 
     //state variable
     string private baseURI;
@@ -32,27 +39,27 @@ contract aryaNFT is Ownable, ReentrancyGuard, Pausable, ERC721URIStorage {
     address payable public publicFund;
 
     //round control
-    bool public firstPublicRoundUnlocked;
-    bool public secondPublicRoundUnlocked;
-    bool public thirdPublicRoundUnlocked;
+    bool public is1stPublicRoundUnlocked;
+    bool public is2ndPublicRoundUnlocked;
+    bool public is3rdPublicRoundUnlocked;
     bool public _isHeroMinted;
 
     //modifier
-    modifier checkLegendNFTsAvailable() {
-        require(msg.value >= legendNFT, "Insufficient value");
+    modifier checkLegendNFTPayment() {
+        require(msg.value >= legendNFTPrice , "Insufficient value: Legend NFTs cost " & legendNFTPrice & " ether" );
         _;
     }
-    modifier checkRareNFTsAvailable() {
-        require(msg.value >= rareNFT, "Insufficient value");
+    modifier checkRareNFTPayment() {
+        require(msg.value >= rareNFTPrice, "Insufficient value: Rare NFTs cost " & rareNFTPrice & " ether");
         _;
     }
-    modifier checkUncommonNFTsAvailable() {
-        require(msg.value >= uncommonNFT, "Insufficient value");
+    modifier checkUncommonNFTPayment() {
+        require(msg.value >= uncommonNFTPrice, "Insufficient value: Uncommon NFTs cost " & uncommonNFTPrice & " ether");
         _;
     }
 
-    modifier checkCommonNFTsAvailable() {
-        require(msg.value >= commonNFT, "Insufficient value");
+    modifier checkCommonNFTPayment() {
+        require(msg.value >= commonNFTPrice, "Insufficient value: Common NFTs cost " & commonNFTPrice & " ether");
         _;
     }
 
@@ -68,30 +75,34 @@ contract aryaNFT is Ownable, ReentrancyGuard, Pausable, ERC721URIStorage {
         publicFund = _publicFund;
     }
 
+
+
     function mintHero() public onlyOwner whenNotPaused nonReentrant {
-        require(!_isHeroMinted, "Hero has already been minted");
-        for (uint256 i = 0; i < 25; i++) {
+        require(!_isHeroMinted, "All " & HERO_NFT_SUPPLY & " Heros have been minted");
+
+        //id 1-25 NFTs
+        for (uint256 i = 1; i <= HERO_NFT_SUPPLY ; i++) {
             _safeMint(msg.sender, i);
         }
         _isHeroMinted = true;
     }
 
-    function mintLegend() external payable checkLegendNFTsAvailable whenNotPaused {
+    function mintLegend() external payable checkLegendNFTPayment whenNotPaused {
         require(
-            firstPublicRoundUnlocked || secondPublicRoundUnlocked || thirdPublicRoundUnlocked,
+            is1stPublicRoundUnlocked || is2ndPublicRoundUnlocked || is3rdPublicRoundUnlocked,
             "Round is not started, yet!"
         );
-        if (firstPublicRoundUnlocked) {
+        if (is1stPublicRoundUnlocked) {
             require(legendNFTCounter <= 1, "All nft is minted in first round");
             _safeMint(msg.sender, 24 + legendNFTCounter);
             _totalMinted.increment();
             legendNFTCounter++;
-        } else if (secondPublicRoundUnlocked) {
+        } else if (is2ndPublicRoundUnlocked) {
             require(legendNFTCounter <= 11, "All NFT minted in second round");
             _safeMint(msg.sender, 24 + legendNFTCounter);
             _totalMinted.increment();
             legendNFTCounter++;
-        } else if (thirdPublicRoundUnlocked) {
+        } else if (is3rdPublicRoundUnlocked) {
             require(legendNFTCounter <= 91, "All nft minted in third round");
             _safeMint(msg.sender, 24 + legendNFTCounter);
             _totalMinted.increment();
@@ -99,25 +110,25 @@ contract aryaNFT is Ownable, ReentrancyGuard, Pausable, ERC721URIStorage {
         }
     }
 
-    function mintRare() external payable checkRareNFTsAvailable whenNotPaused {
+    function mintRare() external payable checkRareNFTPayment whenNotPaused {
         require(
-            firstPublicRoundUnlocked || secondPublicRoundUnlocked || thirdPublicRoundUnlocked,
+            is1stPublicRoundUnlocked || is2ndPublicRoundUnlocked || is3rdPublicRoundUnlocked,
             "Round is not started, yet!"
         );
-        if (firstPublicRoundUnlocked) {
+        if (is1stPublicRoundUnlocked) {
             require(rareNFTCounter <= 5, "All nft is minted in first round");
             _safeMint(msg.sender, 126 + rareNFTCounter);
 
             _totalMinted.increment();
             rareNFTCounter++;
-        } else if (secondPublicRoundUnlocked) {
+        } else if (is2ndPublicRoundUnlocked) {
             require(rareNFTCounter <= 55, "All NFT minted in second round");
 
             _safeMint(msg.sender, 126 + rareNFTCounter);
 
             rareNFTCounter++;
             _totalMinted.increment();
-        } else if (thirdPublicRoundUnlocked) {
+        } else if (is3rdPublicRoundUnlocked) {
             require(rareNFTCounter <= 455, "All nft minted in third round");
             _safeMint(msg.sender, 126 + rareNFTCounter);
             rareNFTCounter++;
@@ -125,12 +136,12 @@ contract aryaNFT is Ownable, ReentrancyGuard, Pausable, ERC721URIStorage {
         }
     }
 
-    function mintUncommon() external payable checkRareNFTsAvailable whenNotPaused {
+    function mintUncommon() external payable checkRareNFTPayment whenNotPaused {
         require(
-            firstPublicRoundUnlocked || secondPublicRoundUnlocked || thirdPublicRoundUnlocked,
+            is1stPublicRoundUnlocked || is2ndPublicRoundUnlocked || is3rdPublicRoundUnlocked,
             "Round is not started, yet!"
         );
-        if (firstPublicRoundUnlocked) {
+        if (is1stPublicRoundUnlocked) {
             require(
                 uncommonNFTCounter <= 25,
                 "All nft is minted in first round"
@@ -138,12 +149,12 @@ contract aryaNFT is Ownable, ReentrancyGuard, Pausable, ERC721URIStorage {
             _safeMint(msg.sender, 626 + uncommonNFTCounter);
             _totalMinted.increment();
             uncommonNFTCounter++;
-        } else if (secondPublicRoundUnlocked) {
+        } else if (is2ndPublicRoundUnlocked) {
             require(uncommonNFTCounter <= 55, "All NFT minted in second round");
             _safeMint(msg.sender, 626 + uncommonNFTCounter);
             uncommonNFTCounter++;
             _totalMinted.increment();
-        } else if (thirdPublicRoundUnlocked) {
+        } else if (is3rdPublicRoundUnlocked) {
             require(uncommonNFTCounter <= 455, "All nft minted in third round");
             _safeMint(msg.sender, 626 + uncommonNFTCounter);
             uncommonNFTCounter++;
@@ -151,12 +162,12 @@ contract aryaNFT is Ownable, ReentrancyGuard, Pausable, ERC721URIStorage {
         }
     }
 
-    function mintCommon() external payable checkRareNFTsAvailable whenNotPaused {
+    function mintCommon() external payable checkRareNFTPayment whenNotPaused {
         require(
-            firstPublicRoundUnlocked || secondPublicRoundUnlocked || thirdPublicRoundUnlocked,
+            is1stPublicRoundUnlocked || is2ndPublicRoundUnlocked || is3rdPublicRoundUnlocked,
             "Round is not started, yet!"
         );
-        if (firstPublicRoundUnlocked) {
+        if (is1stPublicRoundUnlocked) {
             require(
                 commonNFTCounter <= 125,
                 "All nft is minted in first round"
@@ -164,12 +175,12 @@ contract aryaNFT is Ownable, ReentrancyGuard, Pausable, ERC721URIStorage {
             _safeMint(msg.sender, 3126 + commonNFTCounter);
             _totalMinted.increment();
             commonNFTCounter++;
-        } else if (secondPublicRoundUnlocked) {
+        } else if (is2ndPublicRoundUnlocked) {
             require(commonNFTCounter <= 1250, "All NFT minted in second round");
             _safeMint(msg.sender, 3126 + commonNFTCounter);
             commonNFTCounter++;
             _totalMinted.increment();
-        } else if (thirdPublicRoundUnlocked) {
+        } else if (is3rdPublicRoundUnlocked) {
             require(commonNFTCounter <= 5770, "All nft minted in third round");
             _safeMint(msg.sender, 3126 + commonNFTCounter);
             commonNFTCounter++;
@@ -206,31 +217,31 @@ contract aryaNFT is Ownable, ReentrancyGuard, Pausable, ERC721URIStorage {
     }
 
     function startfirstPublicRoundUnlocked() external onlyOwner whenNotPaused {
-        require(firstPublicRoundUnlocked != true, "first round is already started");
+        require(is1stPublicRoundUnlocked != true, "first round is already started");
         require(_isHeroMinted, "Hero NFT is not Minted yet!");
-        firstPublicRoundUnlocked = true;
+        is1stPublicRoundUnlocked = true;
     }
 
     function startsecondPublicRoundUnlocked() external onlyOwner whenNotPaused {
-        require(firstPublicRoundUnlocked != false, "First round is not started");
-        require(secondPublicRoundUnlocked != true, "second round is already started");
+        require(is1stPublicRoundUnlocked != false, "First round is not started");
+        require(is2ndPublicRoundUnlocked != true, "second round is already started");
         require(
             _totalMinted.current() == 156,
             "not all nfts minted of first round"
         );
-        secondPublicRoundUnlocked = true;
-        firstPublicRoundUnlocked = false;
+        is2ndPublicRoundUnlocked = true;
+        is1stPublicRoundUnlocked = false;
     }
 
     function startthirdPublicRoundUnlocked() external onlyOwner whenNotPaused {
-        require(secondPublicRoundUnlocked != false, "second round is not started");
+        require(is2ndPublicRoundUnlocked != false, "second round is not started");
         //need to check total nft are minted in second round or not
         require(
             _totalMinted.current() == 1560,
             "not all nfts minted of second round"
         );
-        thirdPublicRoundUnlocked = true;
-        secondPublicRoundUnlocked = false;
+        is3rdPublicRoundUnlocked = true;
+        is2ndPublicRoundUnlocked = false;
     }
 
     function setBaseExtension(string memory _newBaseExtension)
