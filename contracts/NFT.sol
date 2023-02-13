@@ -15,13 +15,13 @@ contract aryaNFT is Ownable, ReentrancyGuard, Pausable, ERC721URIStorage {
     //counter variable
     uint256 public legendNFTCounter = 1;
     uint256 public rareNFTCounter = 1;
-    uint256 public UncommonNFTCounter = 1;
+    uint256 public uncommonNFTCounter = 1;
     uint256 public commonNFTCounter = 1;
 
     // pricing
     uint256 public legendNFT = 1.64 ether;
     uint256 public rareNFT = 0.33 ether;
-    uint256 public UncommonNFT = 0.066 ether;
+    uint256 public uncommonNFT = 0.066 ether;
     uint256 public commonNFT = 0.013 ether;
     //state variable
     string private baseURI;
@@ -43,7 +43,7 @@ contract aryaNFT is Ownable, ReentrancyGuard, Pausable, ERC721URIStorage {
         _;
     }
     modifier uncommonComplaince() {
-        require(msg.value >= UncommonNFT, "Insufficient value");
+        require(msg.value >= uncommonNFT, "Insufficient value");
         _;
     }
 
@@ -126,21 +126,21 @@ contract aryaNFT is Ownable, ReentrancyGuard, Pausable, ERC721URIStorage {
         );
         if (firstPublicRound) {
             require(
-                UncommonNFTCounter <= 25,
+                uncommonNFTCounter <= 25,
                 "All nft is minted in first round"
             );
-            _safeMint(msg.sender, 626 + UncommonNFTCounter);
+            _safeMint(msg.sender, 626 + uncommonNFTCounter);
             _totalMinted.increment();
-            UncommonNFTCounter++;
+            uncommonNFTCounter++;
         } else if (secondPublicRound) {
-            require(UncommonNFTCounter <= 55, "All NFT minted in second round");
-            _safeMint(msg.sender, 626 + UncommonNFTCounter);
-            UncommonNFTCounter++;
+            require(uncommonNFTCounter <= 55, "All NFT minted in second round");
+            _safeMint(msg.sender, 626 + uncommonNFTCounter);
+            uncommonNFTCounter++;
             _totalMinted.increment();
         } else if (thirdPublicRound) {
-            require(UncommonNFTCounter <= 455, "All nft minted in third round");
-            _safeMint(msg.sender, 626 + UncommonNFTCounter);
-            UncommonNFTCounter++;
+            require(uncommonNFTCounter <= 455, "All nft minted in third round");
+            _safeMint(msg.sender, 626 + uncommonNFTCounter);
+            uncommonNFTCounter++;
             _totalMinted.increment();
         }
     }
