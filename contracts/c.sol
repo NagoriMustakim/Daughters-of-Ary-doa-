@@ -65,7 +65,7 @@ contract MyDAO is ERC721 {
     
     // Function to contribute to the crowdfunding campaign
     function contribute() public payable {
-        require(campaignStart > 0, "Campaign has not started.");
+        require(campaignStart > 0, "Campaign has not started."); 
         require(block.timestamp <= campaignStart + campaignDuration, "Campaign has ended.");
         fundingProgress += msg.value;
         require(fundingProgress <= fundingGoal, "Funding goal has been reached.");
