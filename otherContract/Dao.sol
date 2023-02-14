@@ -37,15 +37,23 @@ contract dao is Ownable, Pausable, ReentrancyGuard {
         bool vetoVote;
         bool passed;
         bool exists;
-        string status;
+        Status status;
         // bool counConducted;
         mapping(address => bool) voteStatus;
+    }
+    enum Status {
+        Pending,
+        Approved,
+        Rejected,
+        Expired,
+        funding,
+        funded
     }
     //mapping
     mapping(uint256 => application) public Applications; //id to application
     mapping(address => bool) public isBan;
     mapping(address => bool) public deList;
-    mapping(address => uint16) public maxPerweek;
+    mapping(address => uint256) public maxPerweek;
 
     //modifier
     modifier checkApplicantEligibility(uint256 _tokenid) {
@@ -125,8 +133,8 @@ contract dao is Ownable, Pausable, ReentrancyGuard {
         newApplication.exists = true;
         newApplication.deadline = block.number + 1 weeks;
         newApplication.amountRequired = _amountRequired;
-        maxPerweek[msg.sender] = uint16(block.timestamp);
-
+        maxPerweek[msg.sender] = (block.timestamp);
+        newApplication.status = Status.Pending;
         emit ApplicationsCreated(
             msg.sender,
             _applicationsCounter.current(),
@@ -190,7 +198,7 @@ contract dao is Ownable, Pausable, ReentrancyGuard {
         );
         require(
             block.number > Applications[_applicationId].deadline,
-            "Voting has not concluded"
+            "1 week is not complete yet!"
         );
         require(
             !Applications[_applicationId].vetoVote,
@@ -225,6 +233,8 @@ contract dao is Ownable, Pausable, ReentrancyGuard {
         a.totalVote = true; //means total vote is counted for that particular applications
         emit ApplicationsCounted(_id, a.passed);
     }
+
+    function Approve(uint256 _applicationId) public onlyOwner returns (bool) {a} 
 
     function delistNFT() internal returns (bool) {}
 
