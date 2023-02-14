@@ -13,6 +13,9 @@ contract aryaNFT is Ownable, ReentrancyGuard, Pausable, ERC721URIStorage {
     using Counters for Counters.Counter;
     Counters.Counter public _totalMinted;
 
+    //revenue split
+    uint256 public PUBLIC_FUND_SPLIT = 60; //60%
+    uint256 public PRIVATE_FUND_SPLIT = 40; //40%
 
     //# sold NFTs
     uint256 public legendNFTCounter = 1;
@@ -218,13 +221,13 @@ contract aryaNFT is Ownable, ReentrancyGuard, Pausable, ERC721URIStorage {
         return baseURI;
     }
 
-    function startfirstPublicRoundUnlocked() external onlyOwner whenNotPaused {
+    function unlock1stPublicRound() external onlyOwner whenNotPaused {
         require(is1stPublicRoundUnlocked != true, "First round is already started");
         require(_isHeroMinted, "Error: Hero NFTs must be minted before 1st Public Round");
         is1stPublicRoundUnlocked = true;
     }
 
-    function startsecondPublicRoundUnlocked() external onlyOwner whenNotPaused {
+    function unlock2ndPublicRound() external onlyOwner whenNotPaused {
         require(is1stPublicRoundUnlocked != false, "1st Public round must be run first");
         require(is2ndPublicRoundUnlocked != true, "2nd Public round is already started");
         require(
@@ -235,7 +238,7 @@ contract aryaNFT is Ownable, ReentrancyGuard, Pausable, ERC721URIStorage {
         is1stPublicRoundUnlocked = false;
     }
 
-    function startthirdPublicRoundUnlocked() external onlyOwner whenNotPaused {
+    function unlock3rdPublicRound() external onlyOwner whenNotPaused {
         require(is2ndPublicRoundUnlocked != false, "second round is not started");
         //need to check total nft are minted in second round or not
         require(
@@ -277,7 +280,7 @@ contract aryaNFT is Ownable, ReentrancyGuard, Pausable, ERC721URIStorage {
         nonReentrant
     {
         uint256 balance = address(this).balance;
-        uint256 daoShare = (balance * 40) / 100;
+        uint256 daoShare = (balance * PRIVATE_FUND_SPLIT) / 100;
         daoContract.transfer(daoShare);
         publicFund.transfer(balance - daoShare);
     }
