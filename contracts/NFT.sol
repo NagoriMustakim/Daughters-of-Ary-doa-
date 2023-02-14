@@ -22,10 +22,10 @@ contract aryaNFT is Ownable, ReentrancyGuard, Pausable, ERC721URIStorage {
 
     //#  NFTs supply in 1st 10K round
     uint256 public HERO_NFT_SUPPLY = 25;
-    uint256 public LEGEND_NFT_SUPPLY = 1;
-    uint256 public RARE_NFT_SUPPLY = 1;
-    uint256 public UNCOMMON_NFT_SUPPLY = 1;
-    uint256 public COMMON_NFT_SUPPLY = 1;
+    uint256 public LEGEND_NFT_SUPPLY = 100;
+    uint256 public RARE_NFT_SUPPLY = 500;
+    uint256 public UNCOMMON_NFT_SUPPLY = 2500;
+    uint256 public COMMON_NFT_SUPPLY = 6900;
 
     // pricing
     uint256 public legendNFTPrice = 1.64 ether; //~$2500
@@ -87,10 +87,11 @@ contract aryaNFT is Ownable, ReentrancyGuard, Pausable, ERC721URIStorage {
         _isHeroMinted = true;
     }
 
+    //todo: fix errors here around IDs
     function mintLegend() external payable checkLegendNFTPayment whenNotPaused {
         require(
             is1stPublicRoundUnlocked || is2ndPublicRoundUnlocked || is3rdPublicRoundUnlocked,
-            "Round is not started, yet!"
+            "No minting round is currently active!"
         );
         if (is1stPublicRoundUnlocked) {
             require(legendNFTCounter <= 1, "All nft is minted in first round");
@@ -188,6 +189,7 @@ contract aryaNFT is Ownable, ReentrancyGuard, Pausable, ERC721URIStorage {
         }
     }
 
+    //get URI of NFT
     function tokenURI(uint256 tokenId)
         public
         view
@@ -197,7 +199,7 @@ contract aryaNFT is Ownable, ReentrancyGuard, Pausable, ERC721URIStorage {
     {
         require(
             _exists(tokenId),
-            "ERC721Metadata: URI query for nonexistent token"
+            "ERC721Metadata: URI query for nonexistent token ID" & tokenId
         );
         string memory currentBaseURI = _baseURI();
         return
@@ -217,17 +219,17 @@ contract aryaNFT is Ownable, ReentrancyGuard, Pausable, ERC721URIStorage {
     }
 
     function startfirstPublicRoundUnlocked() external onlyOwner whenNotPaused {
-        require(is1stPublicRoundUnlocked != true, "first round is already started");
-        require(_isHeroMinted, "Hero NFT is not Minted yet!");
+        require(is1stPublicRoundUnlocked != true, "First round is already started");
+        require(_isHeroMinted, "Error: Hero NFTs must be minted before 1st Public Round");
         is1stPublicRoundUnlocked = true;
     }
 
     function startsecondPublicRoundUnlocked() external onlyOwner whenNotPaused {
-        require(is1stPublicRoundUnlocked != false, "First round is not started");
-        require(is2ndPublicRoundUnlocked != true, "second round is already started");
+        require(is1stPublicRoundUnlocked != false, "1st Public round must be run first");
+        require(is2ndPublicRoundUnlocked != true, "2nd Public round is already started");
         require(
             _totalMinted.current() == 156,
-            "not all nfts minted of first round"
+            "The 1st Public round is not complete"
         );
         is2ndPublicRoundUnlocked = true;
         is1stPublicRoundUnlocked = false;
