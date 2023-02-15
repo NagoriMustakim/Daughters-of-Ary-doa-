@@ -272,15 +272,15 @@ contract aryaNFT is
     function unlock2ndPublicRound() external onlyOwner whenNotPaused {
         require(
             is1stPublicRoundUnlocked != false,
-            "First round is not started"
+            "1st round is not started"
         );
         require(
             is2ndPublicRoundUnlocked != true,
             "2nd round is already started"
         );
         require(
-            _totalMinted.current() == 156,
-            "not all nfts minted of 1st round"
+            _totalMinted.current() == NFT_SUPPLY_1st,
+            "not all NFTs minted in 1st round"
         );
         is2ndPublicRoundUnlocked = true;
         is1stPublicRoundUnlocked = false;
@@ -291,10 +291,14 @@ contract aryaNFT is
             is2ndPublicRoundUnlocked != false,
             "2nd round is not started"
         );
+        require(
+            is3rdPublicRoundUnlocked != true,
+            "3rd round is already started"
+        );
         //need to check total nft are minted in 2nd round or not
         require(
-            _totalMinted.current() == 1560,
-            "not all nfts minted of 2nd round"
+            _totalMinted.current() == NFT_SUPPLY_2nd,
+            "not all NFTs minted of 2nd round"
         );
         is3rdPublicRoundUnlocked = true;
         is2ndPublicRoundUnlocked = false;
