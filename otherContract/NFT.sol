@@ -215,7 +215,7 @@ contract aryaNFT is Ownable, ReentrancyGuard, Pausable, ERC721URIStorage {
     }
 
     function mintCommon() external payable checkRareNFTPayment whenNotPaused {
-        //check there are Uncommon NFTs left to mint
+        //check there are Common NFTs left to mint
         require(
             is1stPublicRoundUnlocked ||
                 is2ndPublicRoundUnlocked ||
