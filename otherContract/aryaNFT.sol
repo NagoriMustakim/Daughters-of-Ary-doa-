@@ -25,12 +25,34 @@ contract aryaNFT is
     uint256 public uncommonNFTCounter;
     uint256 public commonNFTCounter;
 
-    //#  NFTs supply in 1st 10K round
-    uint256 public HERO_NFT_SUPPLY = 25;
-    uint256 public LEGEND_NFT_SUPPLY = 1;
-    uint256 public RARE_NFT_SUPPLY = 5;
-    uint256 public UNCOMMON_NFT_SUPPLY = 25;
-    uint256 public COMMON_NFT_SUPPLY = 125;
+    //#  NFTs supply in 1st round
+    uint256 public HERO_NFT_SUPPLY_1st = 25;
+    uint256 public LEGEND_NFT_SUPPLY_1st = 1;
+    uint256 public RARE_NFT_SUPPLY_1st = 5;
+    uint256 public UNCOMMON_NFT_SUPPLY_1st = 25;
+    uint256 public COMMON_NFT_SUPPLY_1st = 125;
+
+    //#  NFTs supply in 2nd round
+    uint256 public HERO_NFT_SUPPLY_2nd = 0;
+    uint256 public LEGEND_NFT_SUPPLY_2nd = 10;
+    uint256 public RARE_NFT_SUPPLY_2nd = 50;
+    uint256 public UNCOMMON_NFT_SUPPLY_2nd = 250;
+    uint256 public COMMON_NFT_SUPPLY_2nd = 1250;
+
+    //#  NFTs supply in 3rd round
+    uint256 public HERO_NFT_SUPPLY_3rd = 0;
+    uint256 public LEGEND_NFT_SUPPLY_3rd = 80;
+    uint256 public RARE_NFT_SUPPLY_3rd = 400;
+    uint256 public UNCOMMON_NFT_SUPPLY_3rd = 2000;
+    uint256 public COMMON_NFT_SUPPLY_3rd = 5770;
+
+
+    //#  NFT Type start indexes
+    uint256 public HERO_NFT_START_INDEX = 1;
+    uint256 public LEGEND_NFT_START_INDEX = 26;
+    uint256 public RARE_NFT_START_INDEX = 127;
+    uint256 public UNCOMMON_START_INDEX = 628;
+    uint256 public COMMON_START_INDEX = 3129;
 
     //# pricing
     uint256 public legendNFTPrice = 1.64 ether; //~$2500
@@ -63,27 +85,27 @@ contract aryaNFT is
     }
 
     //# mapping
-    mapping(uint256 => mapping(uint256 => typeOfNFT)) public idToType; //global id to type of nft or class of nft
+    mapping(uint256 => mapping(uint256 => typeOfNFT)) public collectionIDToNFTType; //global id to type of nft or class of nft
 
     //modifier
     modifier checkLegendNFTPayment() {
         require(
             msg.value >= legendNFTPrice,
-            "Insufficient value: Legend NFTs cost 1.64 ether"
+            "Insufficient value: Legend NFTs cost " & legendNFTPrice & " ether"
         );
         _;
     }
     modifier checkRareNFTPayment() {
         require(
             msg.value >= rareNFTPrice,
-            "Insufficient value: Rare NFTs cost 0.33 ether"
+            "Insufficient value: Rare NFTs cost " & rareNFTPrice & " ether"
         );
         _;
     }
     modifier checkUncommonNFTPayment() {
         require(
             msg.value >= uncommonNFTPrice,
-            "Insufficient value: Uncommon NFTs cost 0.066 ether"
+            "Insufficient value: Uncommon NFTs cost " & uncommonNFTPrice & " ether"
         );
         _;
     }
@@ -91,7 +113,7 @@ contract aryaNFT is
     modifier checkCommonNFTPayment() {
         require(
             msg.value >= commonNFTPrice,
-            "Insufficient value: Common NFTs cost 0.013 ether"
+            "Insufficient value: Common NFTs cost " & commonNFTPrice & " ether"
         );
         _;
     }
@@ -120,136 +142,96 @@ contract aryaNFT is
         whenNotPaused
         nonReentrant
     {
-        require(uri.length == HERO_NFT_SUPPLY, "Provide all uri");
-        require(!_isHeroMinted, "All 25 Heros have been minted");
+        require(uri.length == HERO_NFT_SUPPLY, "Provide all URI");
+        require(!_isHeroMinted, "All " & HERO_NFT_SUPPLY & " Heros have been minted");
         //id 1-25 NFTs
-        for (uint256 i = 1; i <= HERO_NFT_SUPPLY; i++) {
+        for (uint256 i = HERO_NFT_START_INDEX; i <= HERO_NFT_SUPPLY_1st; i++) {
             _safeMint(msg.sender, i);
             _setTokenURI(i, uri[i]);
             _totalMinted.increment();
-            idToType[_totalMinted.current()][i] = typeOfNFT.Hero;
+            collectionIDToNFTType[_totalMinted.current()][i] = typeOfNFT.Hero;
         }
         _isHeroMinted = true;
     }
 
     function mintLegend() external payable checkLegendNFTPayment whenNotPaused {
+        //check round open
         require(
-            is1stPublicRoundUnlocked ||
-                is2ndPublicRoundUnlocked ||
-                is3rdPublicRoundUnlocked,
-            "Round is not started, yet!"
+            is1stPublicRoundUnlocked || is2ndPublicRoundUnlocked || is3rdPublicRoundUnlocked,
+            "Round is not started yet"
         );
-        if (is1stPublicRoundUnlocked) {
-            require(
-                legendNFTCounter < LEGEND_NFT_SUPPLY,
-                "All nft is minted in first round"
-            );
-            _safeMint(msg.sender, legendNFTCounter);
-            _totalMinted.increment();
-            legendNFTCounter++;
-            idToType[_totalMinted.current()][legendNFTCounter] = typeOfNFT
-                .Legend;
-        } else if (is2ndPublicRoundUnlocked) {
-            require(legendNFTCounter <= 11, "All NFT minted in second round");
-            _safeMint(msg.sender, 24 + legendNFTCounter);
-            _totalMinted.increment();
-            legendNFTCounter++;
-        } else if (is3rdPublicRoundUnlocked) {
-            require(legendNFTCounter <= 91, "All nft minted in third round");
-            _safeMint(msg.sender, 24 + legendNFTCounter);
-            _totalMinted.increment();
-            legendNFTCounter++;
-        }
+
+        //check supply exists
+        require(is1stPublicRoundUnlocked && legendNFTCounter < LEGEND_NFT_SUPPLY_1st, "All Legend NFTs are minted for the 1st public round");
+        require(is2ndPublicRoundUnlocked && legendNFTCounter < LEGEND_NFT_SUPPLY_2nd, "All Legend NFTs are minted for the 2nd public round");
+        require (is3rdPublicRoundUnlocked&& legendNFTCounter < LEGEND_NFT_SUPPLY_3rd, "All Legend NFTs are minted for the 3rd public round");
+
+        //mint
+        _safeMint(msg.sender, LEGEND_NFT_START_INDEX + legendNFTCounter);
+        _totalMinted.increment();
+        collectionIDToNFTType[_totalMinted.current()][legendNFTCounter] = typeOfNFT.Legend;
+
+        legendNFTCounter++;
     }
 
     function mintRare() external payable checkRareNFTPayment whenNotPaused {
+        //check round open
         require(
-            is1stPublicRoundUnlocked ||
-                is2ndPublicRoundUnlocked ||
-                is3rdPublicRoundUnlocked,
-            "Round is not started, yet!"
+            is1stPublicRoundUnlocked || is2ndPublicRoundUnlocked || is3rdPublicRoundUnlocked,
+            "Round is not started yet"
         );
-        if (is1stPublicRoundUnlocked) {
-            require(
-                rareNFTCounter < RARE_NFT_SUPPLY,
-                "All nft is minted in first round"
-            );
-            _safeMint(msg.sender, rareNFTCounter);
-            _totalMinted.increment();
-            rareNFTCounter++;
-            idToType[_totalMinted.current()][rareNFTCounter] = typeOfNFT.Rare;
-        } else if (is2ndPublicRoundUnlocked) {
-            require(rareNFTCounter <= 55, "All NFT minted in second round");
+        
+        //check supply exists
+        require(is1stPublicRoundUnlocked && rareNFTCounter < RARE_NFT_SUPPLY_1st, "All Rare NFTs are minted for the 1st public round");
+        require(is2ndPublicRoundUnlocked && rareNFTCounter < RARE_NFT_SUPPLY_1st, "All Rare NFTs are minted for the 2nd public round");
+        require (is3rdPublicRoundUnlocked&& rareNFTCounter < RARE_NFT_SUPPLY_1st, "All Rare NFTs are minted for the 3rd public round");
 
-            _safeMint(msg.sender, 126 + rareNFTCounter);
+        //mint
+        _safeMint(msg.sender, RARE_NFT_START_INDEX + rareNFTCounter);
+        _totalMinted.increment();
+        collectionIDToNFTType[_totalMinted.current()][rareNFTCounter] = typeOfNFT.Rare;
 
-            rareNFTCounter++;
-            _totalMinted.increment();
-        } else if (is3rdPublicRoundUnlocked) {
-            require(rareNFTCounter <= 455, "All nft minted in third round");
-            _safeMint(msg.sender, 126 + rareNFTCounter);
-            rareNFTCounter++;
-            _totalMinted.increment();
-        }
+        rareNFTCounter++;
     }
 
-    function mintUncommon() external payable checkRareNFTPayment whenNotPaused {
+    function mintUncommon() external payable checkUncommonNFTPayment whenNotPaused {
+        //check round open
         require(
-            is1stPublicRoundUnlocked ||
-                is2ndPublicRoundUnlocked ||
-                is3rdPublicRoundUnlocked,
-            "Round is not started, yet!"
+            is1stPublicRoundUnlocked || is2ndPublicRoundUnlocked || is3rdPublicRoundUnlocked,
+            "Round is not started yet"
         );
-        if (is1stPublicRoundUnlocked) {
-            require(
-                uncommonNFTCounter < UNCOMMON_NFT_SUPPLY,
-                "All nft is minted in first round"
-            );
-            _safeMint(msg.sender, 626 + uncommonNFTCounter);
-            _totalMinted.increment();
-            uncommonNFTCounter++;
-            idToType[_totalMinted.current()][uncommonNFTCounter] = typeOfNFT
-                .Uncommon;
-        } else if (is2ndPublicRoundUnlocked) {
-            require(uncommonNFTCounter <= 55, "All NFT minted in second round");
-            _safeMint(msg.sender, 626 + uncommonNFTCounter);
-            uncommonNFTCounter++;
-            _totalMinted.increment();
-        } else if (is3rdPublicRoundUnlocked) {
-            require(uncommonNFTCounter <= 455, "All nft minted in third round");
-            _safeMint(msg.sender, 626 + uncommonNFTCounter);
-            uncommonNFTCounter++;
-            _totalMinted.increment();
-        }
+        
+        //check supply exists
+        require(is1stPublicRoundUnlocked && uncommonNFTCounter < UNCOMMON_NFT_SUPPLY_1st, "All Uncommon NFTs are minted for the 1st public round");
+        require(is2ndPublicRoundUnlocked && uncommonNFTCounter < UNCOMMON_NFT_SUPPLY_1st, "All Uncommon NFTs are minted for the 2nd public round");
+        require (is3rdPublicRoundUnlocked&& uncommonNFTCounter < UNCOMMON_NFT_SUPPLY_1st, "All Uncommon NFTs are minted for the 3rd public round");
+
+        //mint
+        _safeMint(msg.sender, UNCOMMON_NFT_START_INDEX + uncommonNFTCounter);
+        _totalMinted.increment();
+        collectionIDToNFTType[_totalMinted.current()][uncommonNFTCounter] = typeOfNFT.Uncommon;
+        
+        uncommonNFTCounter++;
     }
 
-    function mintCommon() external payable checkRareNFTPayment whenNotPaused {
+    function mintcommon() external payable checkCommonNFTPayment whenNotPaused {
+        //check round open
         require(
-            is1stPublicRoundUnlocked ||
-                is2ndPublicRoundUnlocked ||
-                is3rdPublicRoundUnlocked,
-            "Round is not started, yet!"
+            is1stPublicRoundUnlocked || is2ndPublicRoundUnlocked || is3rdPublicRoundUnlocked,
+            "Round is not started yet"
         );
-        if (is1stPublicRoundUnlocked) {
-            require(
-                commonNFTCounter < COMMON_NFT_SUPPLY,
-                "All nft is minted in first round"
-            );
-            _safeMint(msg.sender, commonNFTCounter);
-            _totalMinted.increment();
-            commonNFTCounter++;
-            idToType[_totalMinted.current()][commonNFTCounter] = typeOfNFT.Rare;
-        } else if (is2ndPublicRoundUnlocked) {
-            require(commonNFTCounter <= 1250, "All NFT minted in second round");
-            _safeMint(msg.sender, 3126 + commonNFTCounter);
-            commonNFTCounter++;
-            _totalMinted.increment();
-        } else if (is3rdPublicRoundUnlocked) {
-            require(commonNFTCounter <= 5770, "All nft minted in third round");
-            _safeMint(msg.sender, 3126 + commonNFTCounter);
-            commonNFTCounter++;
-            _totalMinted.increment();
-        }
+        
+        //check supply exists
+        require(is1stPublicRoundUnlocked && commonNFTCounter < COMMON_NFT_SUPPLY_1st, "All Common NFTs are minted for the 1st public round");
+        require(is2ndPublicRoundUnlocked && commonNFTCounter < COMMON_NFT_SUPPLY_1st, "All Common NFTs are minted for the 2nd public round");
+        require (is3rdPublicRoundUnlocked&& commonNFTCounter < COMMON_NFT_SUPPLY_1st, "All Common NFTs are minted for the 3rd public round");
+
+        //mint
+        _safeMint(msg.sender, COMMON_NFT_START_INDEX + commonNFTCounter);
+        _totalMinted.increment();
+        collectionIDToNFTType[_totalMinted.current()][commonNFTCounter] = typeOfNFT.Common;
+        
+        commonNFTCounter++;
     }
 
     function _burn(uint256 tokenId)
