@@ -46,6 +46,11 @@ contract aryaNFT is
     uint256 public UNCOMMON_NFT_SUPPLY_3rd = 2000;
     uint256 public COMMON_NFT_SUPPLY_3rd = 5770;
 
+    //#  NFTs supply totals
+    uint256 public NFT_SUPPLY_1st = 181;
+    uint256 public NFT_SUPPLY_2nd = 1560;
+    uint256 public NFT_SUPPLY_3rd = 8250;
+
 
     //#  NFT Type start indexes
     uint256 public HERO_NFT_START_INDEX = 1;
@@ -254,41 +259,42 @@ contract aryaNFT is
         return baseURIForHero;
     }
 
-    function startfirstPublicRoundUnlocked() external onlyOwner whenNotPaused {
+    function unlock1stPublicRound() external onlyOwner whenNotPaused {
         require(
             is1stPublicRoundUnlocked != true,
-            "first round is already started"
+            "1st round is already started"
         );
         require(_isHeroMinted, "Hero NFT is not Minted yet!");
+
         is1stPublicRoundUnlocked = true;
     }
 
-    function startsecondPublicRoundUnlocked() external onlyOwner whenNotPaused {
+    function unlock2ndPublicRound() external onlyOwner whenNotPaused {
         require(
             is1stPublicRoundUnlocked != false,
             "First round is not started"
         );
         require(
             is2ndPublicRoundUnlocked != true,
-            "second round is already started"
+            "2nd round is already started"
         );
         require(
             _totalMinted.current() == 156,
-            "not all nfts minted of first round"
+            "not all nfts minted of 1st round"
         );
         is2ndPublicRoundUnlocked = true;
         is1stPublicRoundUnlocked = false;
     }
 
-    function startthirdPublicRoundUnlocked() external onlyOwner whenNotPaused {
+    function unlock3rdPublicRound() external onlyOwner whenNotPaused {
         require(
             is2ndPublicRoundUnlocked != false,
-            "second round is not started"
+            "2nd round is not started"
         );
-        //need to check total nft are minted in second round or not
+        //need to check total nft are minted in 2nd round or not
         require(
             _totalMinted.current() == 1560,
-            "not all nfts minted of second round"
+            "not all nfts minted of 2nd round"
         );
         is3rdPublicRoundUnlocked = true;
         is2ndPublicRoundUnlocked = false;
