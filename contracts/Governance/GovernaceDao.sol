@@ -17,9 +17,9 @@ contract MyGovernor is
     constructor(IVotes _token, ICompoundTimelock _timelock)
         Governor("MyGovernor")
         GovernorSettings(
-            1, /* 1 block */
+            1, /* 1 block after the one block nft holder can propose a proposal */
             63,
-            2
+            2   
         )
         GovernorVotes(_token)
         GovernorTimelockCompound(_timelock)
