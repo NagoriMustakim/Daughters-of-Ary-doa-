@@ -65,10 +65,10 @@ contract aryaNFT is
 
 
     //# sold NFTs
-    uint256 public legendNFTCounter;
-    uint256 public rareNFTCounter;
-    uint256 public uncommonNFTCounter;
-    uint256 public commonNFTCounter;
+    Counters.Counter uint256 legendNFTCounter;
+    Counters.Counter uint256 rareNFTCounter;
+    Counters.Counter uint256 uncommonNFTCounter;
+    Counters.Counter uint256 commonNFTCounter;
 
     //# state variable
     string public baseURIForHero;
