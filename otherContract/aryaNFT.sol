@@ -343,7 +343,6 @@ contract aryaNFT is
         uint256 publicFundShare = (balance * PUBLIC_FUND_PERCENTAGE) / 100;
 
         publicFund.transfer(publicFundShare);
-
         privateFundAddress.transfer(balance - publicFundShare);
     }
 
