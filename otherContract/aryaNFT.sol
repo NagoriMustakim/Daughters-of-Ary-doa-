@@ -20,8 +20,8 @@ contract aryaNFT is
     Counters.Counter public _totalMinted;
 
     //fund distribution
-    uint256 public publicFundPercentage = 60; //60%
-    uint256 public privateFundPercentage = 40; //40%
+    uint256 public PUBLIC_FUND_PERCENTAGE = 60; //60%
+    uint256 public PRIVATE_FUND_PERCENTAGE = 40; //40%
 
     //#  NFTs supply in 1st round
     uint256 public HERO_NFT_SUPPLY_1st = 25;
@@ -333,16 +333,18 @@ contract aryaNFT is
         _unpause();
     }
 
-    function splitPayment(address payable daoContract)
+    function splitPayment(address payable privateFundAddress)
         external
         onlyOwner
         whenNotPaused
         nonReentrant
     {
         uint256 balance = address(this).balance;
-        uint256 daoShare = (balance * privateFundPercentage) / 100;
-        daoContract.transfer(daoShare);
-        publicFund.transfer(balance - daoShare);
+        uint256 publicFundShare = (balance * PUBLIC_FUND_PERCENTAGE) / 100;
+
+        publicFund.transfer(publicFundShare);
+
+        privateFundAddress.transfer(balance - publicFundShare);
     }
 
     receive() external payable {}
