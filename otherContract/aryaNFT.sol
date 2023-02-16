@@ -19,11 +19,9 @@ contract aryaNFT is
     using Counters for Counters.Counter;
     Counters.Counter public _totalMinted;
 
-    //# sold NFTs
-    uint256 public legendNFTCounter;
-    uint256 public rareNFTCounter;
-    uint256 public uncommonNFTCounter;
-    uint256 public commonNFTCounter;
+    //fund distribution
+    uint256 public publicFundPercentage = 60; //60%
+    uint256 public privateFundPercentage = 40; //40%
 
     //#  NFTs supply in 1st round
     uint256 public HERO_NFT_SUPPLY_1st = 25;
@@ -64,6 +62,13 @@ contract aryaNFT is
     uint256 public rareNFTPrice = 0.33 ether; //~$500
     uint256 public uncommonNFTPrice = 0.066 ether; //~$100
     uint256 public commonNFTPrice = 0.013 ether; //~$20
+
+
+    //# sold NFTs
+    uint256 public legendNFTCounter;
+    uint256 public rareNFTCounter;
+    uint256 public uncommonNFTCounter;
+    uint256 public commonNFTCounter;
 
     //# state variable
     string public baseURIForHero;
@@ -335,7 +340,7 @@ contract aryaNFT is
         nonReentrant
     {
         uint256 balance = address(this).balance;
-        uint256 daoShare = (balance * 40) / 100;
+        uint256 daoShare = (balance * privateFundPercentage) / 100;
         daoContract.transfer(daoShare);
         publicFund.transfer(balance - daoShare);
     }
